@@ -31,6 +31,7 @@ import javax.validation.constraints.NotNull
 import javax.validation.constraints.Size
 
 /**
+ * Represents words in repository
  *
  * @author petr.langr
  * @since 1.0.0

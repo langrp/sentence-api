@@ -25,6 +25,7 @@
 
 package com.gooddata.example.rest
 
+import com.gooddata.example.message.SentenceAggregateMsg
 import com.gooddata.example.message.SentenceMsg
 import com.gooddata.example.services.SentenceService
 import org.springframework.beans.factory.annotation.Autowired
@@ -68,5 +69,11 @@ class SentenceApi @Autowired constructor(
     fun generateSentence(): Mono<SentenceMsg> =
             sentenceService.generateSentence()
             .onErrorMap{ ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, it.message) }
+
+    @GetMapping("/sentences/duplicates")
+    fun getDuplicates(): Flux<SentenceAggregateMsg> = sentenceService.findByWords()
+            .switchIfEmpty(Mono.error {
+                ResponseStatusException(HttpStatus.NOT_FOUND, "No duplicate sentences found")
+            })
 
 }

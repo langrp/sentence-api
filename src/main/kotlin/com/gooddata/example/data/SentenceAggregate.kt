@@ -25,22 +25,32 @@
 
 package com.gooddata.example.data
 
+import org.springframework.data.annotation.Id
+
 /**
- * Word categories
+ * Represents sentence aggregates for searching duplicated sentences
  *
  * @author petr.langr
  * @since 1.0.0
  */
-enum class WordCategory(
-        /** Ordinal number for yoda sentence order */
-        val yodaOrder: Int
+data class SentenceAggregate(
+        @get:Id
+        val id: Array<Word>,
+        val sentenceIds: Array<String>,
+        val count: Long
 ) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
 
-    /** The given word represents noun */
-    NOUN(1),
-    /** The given word represents verb */
-    VERB(2),
-    /** The given word represents adjective */
-    ADJECTIVE(0)
+        other as SentenceAggregate
 
+        if (!id.contentEquals(other.id)) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return id.hashCode()
+    }
 }

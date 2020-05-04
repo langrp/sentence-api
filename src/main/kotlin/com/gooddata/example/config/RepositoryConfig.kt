@@ -32,6 +32,7 @@ import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean
 
 
 /**
+ * Repositories java-based configuration
  *
  * @author petr.langr
  * @since 1.0.0
@@ -39,11 +40,17 @@ import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean
 @Configuration
 class RepositoryConfig {
 
+    /**
+     * Mongo DB listener to validates documents using bean validator
+     */
     @Bean
     fun validatingMongoEventListener(): ValidatingMongoEventListener {
         return ValidatingMongoEventListener(validator())
     }
 
+    /**
+     * Hibernate bean validator
+     */
     @Bean
     fun validator(): LocalValidatorFactoryBean {
         return LocalValidatorFactoryBean()

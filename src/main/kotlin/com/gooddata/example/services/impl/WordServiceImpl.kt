@@ -26,9 +26,9 @@
 package com.gooddata.example.services.impl
 
 import com.gooddata.example.data.Word
-import com.gooddata.example.loggerFor
 import com.gooddata.example.repository.WordRepository
 import com.gooddata.example.services.WordService
+import com.gooddata.example.util.loggerFor
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service

@@ -51,6 +51,9 @@ interface WordRepository: ReactiveMongoRepository<Word, String> {
      */
     fun countByCategory(category: WordCategory): Mono<Long>
 
+    /**
+     * Finds all words by category and given page specifics
+     */
     fun findFirstByCategory(category: WordCategory, pageable: Pageable): Flux<Word>
 
 }

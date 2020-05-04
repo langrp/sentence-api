@@ -25,6 +25,7 @@
 
 package com.gooddata.example.services
 
+import com.gooddata.example.message.SentenceAggregateMsg
 import com.gooddata.example.message.SentenceMsg
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
@@ -36,6 +37,9 @@ import reactor.core.publisher.Mono
  */
 interface SentenceService {
 
+    /**
+     * Finds all sentences
+     */
     fun findAll(): Flux<SentenceMsg>
 
     /**
@@ -48,6 +52,14 @@ interface SentenceService {
      */
     fun findByIdYodaTalk(id: String): Mono<SentenceMsg>
 
+    /**
+     * Generate sequence, persists and return it.
+     */
     fun generateSentence(): Mono<SentenceMsg>
+
+    /**
+     * Finds all duplicated sentences by words
+     */
+    fun findByWords(): Flux<SentenceAggregateMsg>
 
 }

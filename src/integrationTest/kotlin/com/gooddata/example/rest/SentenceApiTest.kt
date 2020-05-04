@@ -25,6 +25,7 @@
 
 package com.gooddata.example.rest
 
+import com.gooddata.example.message.SentenceAggregateMsg
 import com.gooddata.example.message.SentenceMsg
 import com.gooddata.example.services.SentenceService
 import com.mongodb.MongoException
@@ -252,4 +253,63 @@ internal class SentenceApiTest {
         verify(sentenceService, times(1)).generateSentence()
 
     }
+
+    @Test
+    fun getDuplicates() {
+
+        `when`(sentenceService.findByWords()).thenReturn(Flux.fromArray(arrayOf(
+                SentenceAggregateMsg("kawa is best", arrayOf("0", "1")),
+                SentenceAggregateMsg("scuba is wet", arrayOf("2", "3", "4"))
+        )))
+
+        //@formatter:off
+        webClient.get()
+                .uri("/sentences/duplicates")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectStatus().isOk
+                .expectBody()
+                    .jsonPath("$").isArray
+                    .jsonPath("$[0].text").isEqualTo("kawa is best")
+                    .jsonPath("$[0].sentenceIds").isArray
+                    .jsonPath("$[0].sentenceIds[0]").isEqualTo("0")
+                    .jsonPath("$[0].sentenceIds[1]").isEqualTo("1")
+                    .jsonPath("$[0].sentenceIds[2]").doesNotExist()
+
+                    .jsonPath("$[1].text").isEqualTo("scuba is wet")
+                    .jsonPath("$[1].sentenceIds").isArray
+                    .jsonPath("$[1].sentenceIds[0]").isEqualTo("2")
+                    .jsonPath("$[1].sentenceIds[1]").isEqualTo("3")
+                    .jsonPath("$[1].sentenceIds[2]").isEqualTo("4")
+                    .jsonPath("$[1].sentenceIds[3]").doesNotExist()
+
+                    .jsonPath("$[2]").doesNotExist()
+        //@formatter:on
+
+        verify(sentenceService, times(1)).findByWords()
+
+    }
+
+    @Test
+    fun getDuplicates_empty() {
+
+        `when`(sentenceService.findByWords()).thenReturn(Flux.empty())
+
+        //@formatter:off
+        webClient.get()
+                .uri("/sentences/duplicates")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectStatus().isNotFound
+                .expectBody()
+                    .jsonPath("$.status").isEqualTo("404")
+                    .jsonPath("$.message").isEqualTo("No duplicate sentences found")
+        //@formatter:on
+
+        verify(sentenceService, times(1)).findByWords()
+
+    }
+
 }

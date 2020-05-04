@@ -26,7 +26,10 @@
 package com.gooddata.example.repository
 
 import com.gooddata.example.data.Sentence
+import com.gooddata.example.data.SentenceAggregate
+import org.springframework.data.mongodb.repository.Aggregation
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository
+import reactor.core.publisher.Flux
 
 /**
  *
@@ -34,4 +37,15 @@ import org.springframework.data.mongodb.repository.ReactiveMongoRepository
  * @since 1.0.0
  */
 interface SentenceRepository: ReactiveMongoRepository<Sentence, String> {
+
+    /**
+     * Find all sentences with the same words (duplicates).
+     */
+    @Suppress("SpringDataRepositoryMethodReturnTypeInspection")
+    @Aggregation(
+            "{ \$group: { _id : \$words, sentenceIds : { \$addToSet : \$_id }, count: { \$sum : 1 } } }",
+            "{ \$match: { count: { \$gt : 1 } } }"
+    )
+    fun findByWords(): Flux<SentenceAggregate>
+
 }

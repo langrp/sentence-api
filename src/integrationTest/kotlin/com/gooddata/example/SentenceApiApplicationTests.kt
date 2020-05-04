@@ -3,6 +3,7 @@ package com.gooddata.example
 import com.gooddata.example.data.Word
 import com.gooddata.example.data.WordCategory
 import com.gooddata.example.db.MongoExtension
+import com.gooddata.example.message.SentenceAggregateMsg
 import com.gooddata.example.message.SentenceMsg
 import net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -154,6 +155,31 @@ class SentenceApiApplicationTests {
 		assertTrue(sentence[1] == "scuba" || sentence[1] == "kawa", "Wrong noun in '$sentence'")
 		assertTrue(sentence[2] == "is" || sentence[2] == "are", "Wrong verb in '$sentence'")
 		assertTrue(sentence[0] == "wet" || sentence[0] == "best", "Wrong adjective in '$sentence'")
+
+	}
+
+	@Test
+	@Order(24)
+	fun getDuplicates_empty() {
+
+		val response = restTemplate.getForEntity("/sentences/duplicates", String::class.java)
+
+		assertEquals(404, response.statusCodeValue, "Response status")
+
+	}
+
+	@Test
+	@Order(27)
+	fun generateDuplicates() {
+
+		restTemplate.postForEntity("/sentences/generate", null, SentenceMsg::class.java)
+		restTemplate.postForEntity("/sentences/generate", null, SentenceMsg::class.java)
+		restTemplate.postForEntity("/sentences/generate", null, SentenceMsg::class.java)
+		restTemplate.postForEntity("/sentences/generate", null, SentenceMsg::class.java)
+
+		val response = restTemplate.getForEntity("/sentences/duplicates", Array<SentenceAggregateMsg>::class.java)
+
+		assertEquals(200, response.statusCodeValue, "Response status")
 
 	}
 

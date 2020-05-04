@@ -23,24 +23,17 @@
  *
  */
 
-package com.gooddata.example.data
+package com.gooddata.example.util
+
+import org.slf4j.LoggerFactory
 
 /**
- * Word categories
  *
  * @author petr.langr
  * @since 1.0.0
  */
-enum class WordCategory(
-        /** Ordinal number for yoda sentence order */
-        val yodaOrder: Int
-) {
 
-    /** The given word represents noun */
-    NOUN(1),
-    /** The given word represents verb */
-    VERB(2),
-    /** The given word represents adjective */
-    ADJECTIVE(0)
-
-}
+/**
+ * Gets a logger for requested class type
+ */
+inline fun <reified T:Any> loggerFor() = LoggerFactory.getLogger(T::class.java)

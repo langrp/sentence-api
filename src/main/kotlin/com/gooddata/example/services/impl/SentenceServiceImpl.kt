@@ -28,6 +28,7 @@ package com.gooddata.example.services.impl
 import com.gooddata.example.data.Sentence
 import com.gooddata.example.data.Word
 import com.gooddata.example.data.WordCategory
+import com.gooddata.example.message.SentenceAggregateMsg
 import com.gooddata.example.message.SentenceMsg
 import com.gooddata.example.repository.SentenceRepository
 import com.gooddata.example.repository.WordRepository
@@ -77,6 +78,9 @@ class SentenceServiceImpl @Autowired constructor(
                 .map { s -> SentenceMsg.of(s) }
                 .next()
     }
+
+    override fun findByWords(): Flux<SentenceAggregateMsg> = sentenceRepository.findByWords()
+            .map { SentenceAggregateMsg.of(it) }
 
     private fun viewSentence(id: String): Mono<Sentence> =
         sentenceRepository.findById(id)

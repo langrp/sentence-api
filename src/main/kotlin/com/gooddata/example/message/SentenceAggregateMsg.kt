@@ -23,14 +23,41 @@
  *
  */
 
-package com.gooddata.example
+package com.gooddata.example.message
 
-import org.slf4j.LoggerFactory
+import com.gooddata.example.data.SentenceAggregate
 
 /**
  *
  * @author petr.langr
  * @since 1.0.0
  */
+data class SentenceAggregateMsg(
+        val text: String,
+        val sentenceIds: Array<String>
+) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
 
-inline fun <reified T:Any> loggerFor() = LoggerFactory.getLogger(T::class.java)
+        other as SentenceAggregateMsg
+
+        if (text != other.text) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return text.hashCode()
+    }
+
+    companion object {
+
+        fun of(aggregate: SentenceAggregate): SentenceAggregateMsg {
+            return SentenceAggregateMsg(
+                    aggregate.id.joinToString(" ") { w -> w.word },
+                    aggregate.sentenceIds)
+        }
+    }
+
+}

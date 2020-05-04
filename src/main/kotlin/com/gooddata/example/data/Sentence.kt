@@ -31,6 +31,7 @@ import java.time.LocalDateTime
 import javax.validation.constraints.Size
 
 /**
+ * Represents sentence document
  *
  * @author petr.langr
  * @since 1.0.0

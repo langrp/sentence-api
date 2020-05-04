@@ -28,6 +28,8 @@ package com.gooddata.example.message
 import com.gooddata.example.data.Sentence
 
 /**
+ * Sentence message responded to REST clients. This avoids repository
+ * specific fields.
  *
  * @author petr.langr
  * @since 1.0.0
