@@ -13,21 +13,24 @@ import org.junit.jupiter.api.MethodOrderer
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestMethodOrder
-import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.boot.web.server.LocalServerPort
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpMethod
+import org.springframework.test.context.TestExecutionListeners
 
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
-@ExtendWith(MongoExtension::class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-		properties = [ "spring.data.mongodb.host=localhost",
-			"spring.data.mongodb.port=27017",
-			"com.gooddata.sentence-api.forbidden_words_file=src/integrationTest/resources/forbidden_words.txt" ]
+		properties = [
+			"com.gooddata.sentence-api.forbidden_words_file=src/integrationTest/resources/forbidden_words.txt"
+		]
+)
+@TestExecutionListeners(
+		listeners = [MongoExtension::class],
+		mergeMode = TestExecutionListeners.MergeMode.MERGE_WITH_DEFAULTS
 )
 class SentenceApiApplicationTests {
 

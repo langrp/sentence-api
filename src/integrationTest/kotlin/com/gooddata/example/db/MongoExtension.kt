@@ -25,15 +25,18 @@
 
 package com.gooddata.example.db
 
-import org.junit.jupiter.api.extension.AfterAllCallback
-import org.junit.jupiter.api.extension.BeforeAllCallback
-import org.junit.jupiter.api.extension.ExtensionContext
 import de.flapdoodle.embed.mongo.MongodExecutable
 import de.flapdoodle.embed.mongo.MongodStarter
 import de.flapdoodle.embed.mongo.config.MongodConfigBuilder
 import de.flapdoodle.embed.mongo.config.Net
 import de.flapdoodle.embed.mongo.distribution.Version
 import de.flapdoodle.embed.process.runtime.Network
+import org.springframework.boot.test.util.TestPropertyValues
+import org.springframework.core.env.ConfigurableEnvironment
+import org.springframework.test.context.TestContext
+import org.springframework.test.context.TestExecutionListener
+import java.net.ServerSocket
+import javax.net.ServerSocketFactory
 
 
 /**
@@ -41,20 +44,31 @@ import de.flapdoodle.embed.process.runtime.Network
  * @author petr.langr
  * @since 1.0.0
  */
-class MongoExtension: BeforeAllCallback, AfterAllCallback {
+class MongoExtension: TestExecutionListener {
 
-    private lateinit var mongoExecutable:MongodExecutable
+    private lateinit var mongoExecutable: MongodExecutable
 
-    override fun beforeAll(context: ExtensionContext?) {
+    private var mongoPort: Int? = null
+
+    override fun beforeTestClass(context: TestContext) {
+        val ss: ServerSocket = ServerSocketFactory.getDefault().createServerSocket(0)
+        val port = ss.localPort
         val config = MongodConfigBuilder()
                 .version(Version.Main.PRODUCTION)
-                .net(Net("localhost", 27017, Network.localhostIsIPv6()))
+                .net(Net("localhost", port, Network.localhostIsIPv6()))
                 .build()
 
         mongoExecutable = MongodStarter.getDefaultInstance().prepare(config)
+        mongoPort = port
+
+        if (context.applicationContext.environment is ConfigurableEnvironment) {
+            val env = context.applicationContext.environment as ConfigurableEnvironment
+            TestPropertyValues.of("spring.data.mongodb.port=$mongoPort").applyTo(env)
+            TestPropertyValues.of("spring.data.mongodb.host=localhost").applyTo(env)
+        }
     }
 
-    override fun afterAll(context: ExtensionContext?) {
+    override fun afterTestClass(context: TestContext) {
         mongoExecutable.stop()
     }
 
